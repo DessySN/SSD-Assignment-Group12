@@ -1,0 +1,79 @@
+﻿@model SSD_LAB1.Models.MessageBoardViewModel
+
+@{
+    ViewData["Title"] = "Message Board";
+}
+
+<h1>Message Board</h1>
+
+<p>Share messages with other users of the application.</p>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <form asp-controller="MessageBoard"
+          asp-action="Create"
+          method="post">
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="NewMessage.Content"
+                   class="form-label"></label>
+
+            <textarea asp-for="NewMessage.Content"
+                      class="form-control"
+                      rows="4"
+                      maxlength="1000"></textarea>
+
+            <span asp-validation-for="NewMessage.Content"
+                  class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Post Message
+        </button>
+    </form>
+}
+else
+{
+    <p>
+        <a asp-area="Identity"
+           asp-page="/Account/Login"
+           asp-route-returnUrl="/MessageBoard">
+            Log in
+        </a>
+        to post a message.
+    </p>
+}
+
+<hr />
+
+<h2>Recent Messages</h2>
+
+@if (Model.Messages.Count == 0)
+{
+    <p>No messages have been posted yet.</p>
+}
+else
+{
+    @foreach (var message in Model.Messages)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <p style="white-space: pre-wrap">@message.Content</p>
+
+                <small class="text-muted">
+                    Posted by
+                    @(message.ApplicationUser?.FirstName ?? "Unknown")
+                    @(message.ApplicationUser?.LastName ?? "")
+                    on @message.PostedAt.ToLocalTime().ToString("g")
+                </small>
+            </div>
+        </div>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
